@@ -24,7 +24,7 @@
     <hr />
     <div id='app'></div>
     <script type='text/javascript'>
-        Library code
+        //Library code
         function createStore (reducer) {
           let state
           let listeners = []
@@ -137,7 +137,7 @@
 
         const store = createStore(app)
 
-        
+
         store.subscribe(() => {
             const { goals, todos } = store.getState()
 
