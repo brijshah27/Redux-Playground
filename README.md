@@ -1,3 +1,3 @@
-## Redux Playground
-
-#### Github repository created for Redux practice.
+Redux Playground
+========
+Github repository created for Redux practice.
