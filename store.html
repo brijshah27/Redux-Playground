@@ -163,15 +163,6 @@
       return result
     }
 
-    // Moved to Redux.thnk in built library
-    // const thunk = (store) => (next) => (action) => {
-    //   if (typeof action === 'function') {
-    //     return action(store.dispatch)
-    //   }
-
-    //   return next(action)
-    // }
-
     // Reducer function
     function todos (state = [], action) {
       switch(action.type) {
@@ -241,16 +232,16 @@
       addItem = (e) => {
         e.preventDefault()
 
-        this.props.store.dispatch(handleAddTodo(
+        this.props.dispatch(handleAddTodo(
           this.input.value,
           () => this.input.value = ''
         ))
       }
       removeItem = (todo) => {
-        this.props.store.dispatch(handleDeleteTodo(todo))
+        this.props.dispatch(handleDeleteTodo(todo))
       }
       toggleItem = (id) => {
-        this.props.store.dispatch(handleToggle(id))
+        this.props.dispatch(handleToggle(id))
       }
       render() {
         return (
@@ -273,17 +264,21 @@
       }
     }
 
+    const ConnectedTodos = connect((state) => ({
+      todos: state.todos
+    }))(Todos)
+
     class Goals extends React.Component {
       addItem = (e) => {
         e.preventDefault()
 
-        this.props.store.dispatch(handleAddGoal(
+        this.props.dispatch(handleAddGoal(
           this.input.value,
           () => this.input.value = ''
         ))
       }
       removeItem = (goal) => {
-        this.props.store.dispatch(handleDeleteGoal(goal))
+        this.props.dispatch(handleDeleteGoal(goal))
       }
       render() {
         return (
@@ -305,17 +300,18 @@
       }
     }
 
+    const ConnectedGoals = connect((state) => ({
+      goals: state.goals
+    }))(Goals)
+
     class App extends React.Component {
       componentDidMount () {
-        const { store } = this.props
+        const { dispatch } = this.props
 
-        store.dispatch(handleInitialData())
-
-        store.subscribe(() => this.forceUpdate())
+        dispatch(handleInitialData())
       }
       render() {
-        const { store } = this.props
-        const { todos, goals, loading } = store.getState()
+        const { loading } = this.props
 
         if (loading === true) {
           return <h3>Loading</h3>
@@ -323,15 +319,35 @@
 
         return (
           <div>
-            <Todos todos={todos} store={store} />
-            <Goals goals={goals} store={store}/>
+            <ConnectedTodos />
+            <ConnectedGoals />
           </div>
         )
       }
     }
 
+    const ConnectedApp = connect((state) => ({
+      loading: state.loading
+    }))(App)
+
+    // connect: Render any component, passing that component any data it needs from the store.
+
+    const Context = React.createContext()
+
+    class Provider extends React.Component {
+      render() {
+        return (
+          <Context.Provider value={this.props.store}>
+            {this.props.children}
+          </Context.Provider>
+        )
+      }
+    }
+
     ReactDOM.render(
-      <App store={store} />,
+      <Provider store={store}>
+        <ConnectedApp />
+      </Provider>,
       document.getElementById('app')
     )
   </script>
